@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html class="no-js">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>RockItDub : Sinulog BlastOff 2014!</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <link rel="stylesheet" href="./css/normalize.min.css">
+        <link rel="stylesheet" href="./css/main.css">
+
+        <script src="./js/vendor/modernizr-2.6.2.min.js"></script>
+    </head>
+    <body>
+
+        <div id="container">
+            <img id="logo" src="img/sonicboom-logo.png" alt="">
+            <div id="user-profile">
+                <img id="profile_pic" src="img/pic.jpg" alt="">
+                <span id="username">BlueYonder</span>
+            </div>
+            <div class="clear-fix"></div>
+            <div id="image-post">
+                <canvas id="kenburns" width="600" height="600">
+                    <p>Your browser doesn't support canvas!</p>
+                </canvas>
+            </div>
+
+        </div>
+        <div id="cover">
+                <img  src="img/cover.png" alt="">
+            </div>
+
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="./js/vendor/jquery-1.10.1.min.js"><\/script>')</script>
+
+        <script src="./js/main.js"></script>
+    </body>
+
+<script type="text/javascript" src="./js/kenburns.js"></script>
+    <script type="text/javascript">
+
+$(document).ready(function(){
+    var image_lists = [];
+    var unseen_images = [];
+    var formatted_images = [];
+    function pull_images(){
+
+        $.getJSON( "http://localhost:8080/filenames?callback=?", function( data ){
+            console.log(data)
+
+            for (x = 0; x < data["images"].length; x++) {
+                filename = "./images/" + data["images"][x];
+                var found = $.inArray(filename, image_lists) > -1;
+                if(image_lists.length == 0){
+                    image_lists.push(filename)
+
+                } else {
+                    if(found == false){
+                        unseen_images.push(filename)
+
+
+                    }
+                }
+
+            }
+
+            if(unseen_images.length != 0){
+                for (y = 0; y < unseen_images.length; y++) {
+                    formatted_images.push({path:unseen_images[y],initialized:false,loaded:false});
+                    image_lists.push(unseen_images[y]);
+                }
+                for (y = 0; y < formatted_images.length; y++) {
+                    index = window.current_image_index + 1;
+                    if(index >= window.images.length){
+                        index = 0;
+                    }
+                    window.images.splice(index, 0, formatted_images[y]);
+                }
+                console.log("NEW!!!")
+                unseen_images = [];
+
+                formatted_images = [];
+            }
+
+            setTimeout(function(){pull_images();}, 2000);
+
+        });
+
+    }
+
+    function pull_images_first(){
+
+        $.getJSON( "http://localhost:8080/filenames?callback=?", function( data ){
+            console.log(data)
+
+            for (x = 0; x < data["images"].length; ++x) {
+                filename = "./images/" + data["images"][x];
+                image_lists.push(filename)
+            }
+            ken_burn_slides(image_lists);
+            setTimeout(function(){pull_images();}, 5000);
+        });
+
+    }
+
+    pull_images_first();
+
+
+
+    function ken_burn_slides(my_images)
+    {
+/*        console.log(my_images)
+        count = my_images.length;
+
+        interval = count * 5000
+
+        console.log(interval)
+
+        setTimeout(function(){pull_images();}, interval);*/
+
+        $('#kenburns').kenburns({
+            images:my_images,
+            frames_per_second: 30,
+            display_time: 5000,
+            fade_time: 500,
+            zoom: 1.2,
+            background_color:'#ffffff',
+            post_render_callback:function($canvas, context) {
+                // Called after the effect is rendered
+                // Draw anything you like on to of the canvas
+                var filename = window.images[window.current_image_index].path;
+                var username = filename.substring(filename.lastIndexOf("_image_")+7,filename.lastIndexOf(".jpg"));
+
+                $("#username").html(username);
+                $("#profile_pic").attr("src","./users/" + username + ".jpg");
+            }
+        });
+
+
+    }
+
+
+
+
+});
+
+</script>
+</html>

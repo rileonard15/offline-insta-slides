@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<!--[if IE 6]>
+<html id="ie6" dir="ltr" lang="en-US">
+<![endif]-->
+<!--[if IE 7]>
+<html id="ie7" dir="ltr" lang="en-US">
+<![endif]-->
+<!--[if IE 8]>
+<html id="ie8" dir="ltr" lang="en-US">
+<![endif]-->
+<!--[if !(IE 6) | !(IE 7) | !(IE 8)  ]><!-->
+<html dir="ltr" lang="en-US">
+<!--<![endif]-->
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<title>ROCKITDUB</title>
+
+<body>
+<img id="profile_pic" style="width: 100px; height: 100px;" /><h1>wohoo</h1>
+
+<!-- <div class="images">
+
+
+</div> -->
+
+<canvas id="kenburns" width="640" height="480">
+    <p>Your browser doesn't support canvas!</p>
+</canvas>
+<link rel="stylesheet" href="./css/normalize.min.css">
+<link rel="stylesheet" href="./css/main.css">
+</head>
+
+</body>
+
+
+<script type="text/javascript" src="./js/jquery-1.9.1.min.js"></script>
+<script type="text/javascript" src="./js/kenburns.js"></script>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+    var image_lists = [];
+    var unseen_images = [];
+    var formatted_images = [];
+    function pull_images(){
+
+        $.getJSON( "http://localhost:8080/filenames?callback=?", function( data ){
+            console.log(data)
+
+            for (x = 0; x < data["images"].length; x++) {
+                filename = "./images/" + data["images"][x];
+                var found = $.inArray(filename, image_lists) > -1;
+                if(image_lists.length == 0){
+                    image_lists.push(filename)
+
+                } else {
+                    if(found == false){
+                        unseen_images.push(filename)
+
+
+                    }
+                }
+
+            }
+
+            if(unseen_images.length != 0){
+                for (y = 0; y < unseen_images.length; y++) {
+                    formatted_images.push({path:unseen_images[y],initialized:false,loaded:false});
+                    image_lists.push(unseen_images[y]);
+                }
+                for (y = 0; y < formatted_images.length; y++) {
+                    index = window.current_image_index + 1;
+                    if(index >= window.images.length){
+                        index = 0;
+                    }
+                    window.images.splice(index, 0, formatted_images[y]);
+                }
+                console.log("NEW!!!")
+                unseen_images = [];
+
+                formatted_images = [];
+            }
+
+            setTimeout(function(){pull_images();}, 2000);
+
+        });
+
+    }
+
+    function pull_images_first(){
+
+        $.getJSON( "http://localhost:8080/filenames?callback=?", function( data ){
+            console.log(data)
+
+            for (x = 0; x < data["images"].length; ++x) {
+                filename = "./images/" + data["images"][x];
+                image_lists.push(filename)
+            }
+            ken_burn_slides(image_lists);
+            setTimeout(function(){pull_images();}, 5000);
+        });
+
+    }
+
+    pull_images_first();
+
+
+
+    function ken_burn_slides(my_images)
+    {
+/*        console.log(my_images)
+        count = my_images.length;
+
+        interval = count * 5000
+
+        console.log(interval)
+
+        setTimeout(function(){pull_images();}, interval);*/
+
+        $('#kenburns').kenburns({
+            images:my_images,
+            frames_per_second: 30,
+            display_time: 5000,
+            fade_time: 500,
+            zoom: 1,
+            background_color:'#ffffff',
+            post_render_callback:function($canvas, context) {
+                // Called after the effect is rendered
+                // Draw anything you like on to of the canvas
+                var filename = window.images[window.current_image_index].path;
+                var username = filename.substring(filename.lastIndexOf("_image_")+7,filename.lastIndexOf(".jpg"));
+
+                $("h1").html(username);
+                $("#profile_pic").attr("src","./users/" + username + ".jpg");
+            }
+        });
+
+
+    }
+
+
+
+
+});
+
+</script>
+
+
+</html>
