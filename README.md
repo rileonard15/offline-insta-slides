@@ -13,11 +13,12 @@
    ```
    git clone https://github.com/rileonard15/offline-insta-slides.git
    ```
-3. Open main.py add instagram client_id and client_secret
+3. Open main.py add instagram client_id, client_secret and a hashtag to be use
 
    ```
    CLIENT_ID = "" # client ID goes here
    CLIENT_SECRET = "" # client SECRET goes here
+   HASHTAG = "" # hashtag to be fetch goes here
    ```
 4. Run webpy server to fetch the images
 

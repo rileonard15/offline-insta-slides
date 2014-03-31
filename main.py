@@ -15,6 +15,7 @@ urls = (
 
 CLIENT_ID = "" # client ID goes here
 CLIENT_SECRET = "" # client SECRET goes here
+HASHTAG = "" # hashtag to be fetch goes here
 
 class IndexHandler:
     def GET(self):
@@ -62,7 +63,7 @@ class LoginHandler:
                     ctr = len(image_lists)
 
                 has = False
-                image_url = "https://api.instagram.com/v1/tags/richard/media/recent?access_token=" + token
+                image_url = "https://api.instagram.com/v1/tags/"+ HASHTAG +"/media/recent?access_token=" + token
                 insta_data = requests.get(image_url)
                 json_datas = simplejson.loads(insta_data.content)
 
